@@ -1,0 +1,757 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天氣百科 Weather Encyclopedia</title>
+<style>
+:root {
+  --navy: #174a75;
+  --blue: #397eb5;
+  --light-blue: #e8f3fc;
+  --pale: #f4f8fc;
+  --text: #263b50;
+  --muted: #71849a;
+  --white: #fff;
+  --border: #dce7f0;
+  --shadow: 0 8px 28px rgba(30,75,110,.09);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background: var(--pale);
+  color: var(--text);
+  line-height: 1.8;
+}
+
+button { font: inherit; cursor: pointer; }
+
+header {
+  height: 70px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.logo {
+  color: var(--navy);
+  font-size: 21px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.logo span { color: var(--blue); }
+
+nav { display: flex; gap: 28px; }
+
+nav button {
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-weight: 600;
+}
+
+nav button:hover { color: var(--blue); }
+
+main { min-height: 75vh; }
+
+.hero {
+  padding: 90px 8%;
+  background:
+    radial-gradient(circle at 80% 20%, #ffffffb0 0 9%, transparent 25%),
+    linear-gradient(125deg, #174a75, #397eb5 60%, #a9d0ed);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "☁";
+  position: absolute;
+  right: 9%;
+  bottom: -100px;
+  font-size: 320px;
+  opacity: .12;
+}
+
+.hero-content {
+  max-width: 1100px;
+  margin: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.hero small { letter-spacing: 3px; opacity: .8; }
+
+.hero h1 {
+  font-size: clamp(35px, 5vw, 58px);
+  line-height: 1.3;
+  margin: 18px 0;
+}
+
+.hero p {
+  font-size: 17px;
+  max-width: 600px;
+  opacity: .9;
+}
+
+.primary-btn {
+  background: white;
+  color: var(--navy);
+  border: 0;
+  border-radius: 8px;
+  padding: 12px 25px;
+  margin-top: 20px;
+  font-weight: 700;
+}
+
+.primary-btn:hover { background: var(--light-blue); }
+
+.container {
+  max-width: 1150px;
+  margin: auto;
+  padding: 65px 25px;
+}
+
+.section-title { margin-bottom: 28px; }
+
+.section-title h2 {
+  font-size: 27px;
+  color: var(--navy);
+  margin: 0;
+}
+
+.section-title p { color: var(--muted); margin: 5px 0; }
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.weather-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.weather-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow);
+}
+
+.card-art {
+  height: 135px;
+  display: grid;
+  place-items: center;
+  font-size: 64px;
+  background: linear-gradient(145deg, #d9edfc, #f3f8fd);
+}
+
+.card-info { padding: 17px; }
+
+.card-info h3 { margin: 0 0 5px; color: var(--navy); }
+
+.card-info p { margin: 0; color: var(--muted); font-size: 13px; }
+
+.info-panel {
+  background: white;
+  padding: 28px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  margin-top: 35px;
+}
+
+.info-panel h3 { color: var(--navy); margin-top: 0; }
+
+.fact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.fact {
+  background: var(--light-blue);
+  padding: 18px;
+  border-radius: 10px;
+}
+
+.fact strong { color: var(--navy); display: block; }
+
+footer {
+  text-align: center;
+  padding: 30px;
+  background: #174a75;
+  color: white;
+  font-size: 13px;
+}
+
+/* 天氣介紹閱讀頁 */
+
+.reader {
+  max-width: 1000px;
+  margin: auto;
+  padding: 40px 20px 65px;
+}
+
+.back-btn {
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.reader-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.reader-header h1 {
+  color: var(--navy);
+  margin: 0;
+  font-size: 34px;
+}
+
+.reader-header p { color: var(--muted); margin: 5px 0 20px; }
+
+.chapter-menu {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 15px 0 25px;
+}
+
+.chapter-menu button {
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--muted);
+  border-radius: 7px;
+  padding: 8px 13px;
+  font-size: 13px;
+}
+
+.chapter-menu button.active {
+  background: var(--navy);
+  color: white;
+  border-color: var(--navy);
+}
+
+.book-page {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  min-height: 460px;
+  animation: appear .3s ease;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.page-banner {
+  padding: 35px 40px;
+  background: linear-gradient(120deg, #e5f2fc, #f5f9fd);
+}
+
+.page-banner small { color: var(--blue); font-weight: 700; }
+
+.page-banner h2 {
+  color: var(--navy);
+  font-size: 28px;
+  margin: 5px 0;
+}
+
+.page-content { padding: 30px 40px; }
+
+.page-content p { line-height: 2; }
+
+.page-content li { margin: 8px 0; }
+
+.weather-note {
+  padding: 17px 20px;
+  background: var(--light-blue);
+  border-left: 4px solid var(--blue);
+  border-radius: 6px;
+  margin: 20px 0;
+}
+
+.timeline {
+  border-left: 3px solid #a9d0ed;
+  padding-left: 25px;
+  margin: 25px 0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 23px;
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -33px;
+  top: 8px;
+  width: 13px;
+  height: 13px;
+  background: var(--blue);
+  border-radius: 50%;
+}
+
+.timeline-item strong { color: var(--navy); }
+
+.reader-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
+  gap: 15px;
+}
+
+.reader-controls button {
+  border: 1px solid var(--border);
+  background: white;
+  padding: 11px 20px;
+  border-radius: 8px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.reader-controls button:hover:not(:disabled) {
+  background: var(--light-blue);
+}
+
+.reader-controls button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+
+.page-count { color: var(--muted); font-weight: 700; }
+
+/* 雲種圖鑑 */
+
+.cloud-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.cloud-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 23px;
+}
+
+.cloud-icon { font-size: 40px; }
+
+.cloud-card h3 { color: var(--navy); margin: 8px 0; }
+
+.cloud-card p { color: var(--muted); font-size: 14px; }
+
+.hidden { display: none !important; }
+
+@media(max-width:800px) {
+  .weather-grid { grid-template-columns: repeat(2, 1fr); }
+  .cloud-grid { grid-template-columns: repeat(2, 1fr); }
+  header { padding: 0 4%; }
+  nav { gap: 12px; }
+  nav button { font-size: 13px; }
+}
+
+@media(max-width:520px) {
+  header { height: auto; padding: 14px; flex-wrap: wrap; gap: 10px; }
+  nav { width: 100%; justify-content: space-between; }
+  .weather-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .card-art { height: 95px; font-size: 48px; }
+  .card-info { padding: 12px; }
+  .card-info h3 { font-size: 16px; }
+  .fact-grid, .cloud-grid { grid-template-columns: 1fr; }
+  .page-content { padding: 22px; }
+  .page-banner { padding: 25px; }
+  .reader-header h1 { font-size: 27px; }
+  .chapter-menu { gap: 5px; }
+  .chapter-menu button { padding: 7px 9px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo" onclick="showHome()">☁ 天氣<span>百科</span></div>
+  <nav>
+    <button onclick="showHome()">首頁</button>
+    <button onclick="showHome('weather')">天氣百科</button>
+    <button onclick="showClouds()">雲種圖鑑</button>
+  </nav>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  Weather Encyclopedia ｜ 天氣現象與氣象變化百科
+  <br>本網站為氣象科普介紹，非即時天氣預報。
+</footer>
+
+<script>
+// ===============================
+// 天氣資料：每種天氣包含六個章節
+// ===============================
+
+const weatherData = [
+{
+ name:"晴天", icon:"☀️", desc:"認識陽光充足、雲量較少的天氣",
+ intro:"晴天通常指天空雲量較少、日照較為充足的天氣。台灣的晴朗天氣常見於高氣壓影響或大氣較穩定的時候。不過，晴天不代表完全沒有雲，也不代表氣溫一定很高。",
+ signs:"晴天通常與較穩定的大氣環境有關。當高氣壓影響範圍擴大時，空氣較容易下沉，使雲層發展受到抑制。天空中的雲量可能逐漸減少，日照時間增加。氣壓可能維持較穩定的狀態，濕度則依地區及季節而有所不同。",
+ cause:"在高氣壓控制下，空氣通常呈現下沉運動。空氣下沉時會受到壓縮而增溫，使相對濕度降低，不利於雲滴形成與雲層發展。因此，天空較容易保持晴朗。不過，局部地區仍可能因地形或水氣條件形成雲朵。",
+ steps:["高氣壓逐漸影響當地，大氣環境趨於穩定。","空氣下沉，雲層發展受到抑制。","原有雲層逐漸減少，天空能見度改善。","雲量較少，日照增加，呈現晴朗天氣。"],
+ clouds:"晴天常見天空中沒有明顯雲層，或只有少量積雲、卷雲。若空氣穩定且水氣較少，雲朵可能不容易發展。高空偶爾出現的卷雲，並不一定代表即將降雨。",
+ notes:"晴天時日照較強，紫外線可能較高，戶外活動應注意防曬與補充水分。夏季晴朗的白天也容易因地表吸收太陽輻射而使氣溫升高。"
+},
+{
+ name:"陰天", icon:"☁️", desc:"認識雲層覆蓋天空的天氣",
+ intro:"陰天是指天空大部分被雲層覆蓋，陽光受到遮蔽的天氣。雖然陰天不一定會下雨，但雲層可能相當厚，讓天空呈現灰白或灰暗的樣貌。",
+ signs:"陰天形成前，天空中的雲量通常會逐漸增加。原本分散的雲朵可能逐漸擴大並連接成片。濕度可能上升，氣壓則會依造成雲層發展的天氣系統而變化，例如鋒面接近時可能逐漸下降。",
+ cause:"當空氣中的水氣增加，或空氣受到抬升而冷卻時，水氣可能凝結成大量雲滴。當雲層持續發展並覆蓋廣大範圍，太陽光便會受到遮蔽，形成陰天。",
+ steps:["水氣增加，或空氣受到抬升。","空氣冷卻，水氣逐漸凝結形成雲。","雲層持續發展，雲量逐漸增加。","大片雲層覆蓋天空，形成陰天。"],
+ clouds:"陰天常見層雲、高層雲及雨層雲等雲種。層雲通常呈現低而均勻的灰色雲層；高層雲可能讓天空呈現灰白色；若雲層持續增厚，則可能發展成雨層雲。",
+ notes:"陰天不代表一定會下雨。若雲層較薄，仍可能有部分陽光穿透。若雲層逐漸增厚且水氣充足，才可能進一步發展成降雨。"
+},
+{
+ name:"降雨", icon:"🌧️", desc:"認識雨水形成與降落的過程",
+ intro:"降雨是大氣中的水滴或冰晶成長到足夠大小後，受到重力作用而落向地面的現象。台灣的降雨來源很多，包括鋒面、午後熱對流、東北季風及颱風等。",
+ signs:"降雨前可能出現雲量增加、雲層增厚及濕度上升等現象。若是鋒面系統接近，氣壓可能逐漸下降，風向也可能改變。午後對流降雨則常在白天受熱後，局部雲層快速發展。",
+ cause:"空氣中的水氣受到抬升後逐漸冷卻，當溫度降至露點附近，水氣便可能凝結成雲滴。雲滴彼此碰撞合併，或冰晶持續成長，當水滴或冰晶足夠大時，就會以雨或其他降水形式落下。",
+ steps:["空氣中的水氣增加，或受到地形、鋒面及對流抬升。","空氣上升冷卻，水氣凝結形成雲滴。","雲層逐漸增厚，雲滴或冰晶持續成長。","降水粒子變大並克服上升氣流，開始降雨。"],
+ clouds:"層雲可能帶來毛毛雨；雨層雲常與範圍較廣、持續時間較長的降雨有關；積雨雲則常帶來短時間較強的陣雨。不同雲種對應的降雨型態也有所不同。",
+ notes:"降雨可能造成路面濕滑、能見度下降及局部積水。山區若持續降雨，還需要留意土石流及山洪等風險。降雨形成的方式不同，持續時間與強度也會有所差異。"
+},
+{
+ name:"雷雨", icon:"⛈️", desc:"認識積雨雲、閃電與雷聲",
+ intro:"雷雨通常伴隨閃電、雷聲及降雨，有時還會出現強陣風或冰雹。台灣夏季午後常因地面受熱而產生強烈對流，形成局部雷雨。",
+ signs:"雷雨發生前，常可觀察到空氣悶熱、水氣充足及積雲快速發展等現象。天空中的雲朵可能逐漸向上堆積，形成高聳的雲塔。局部氣壓可能因對流系統而出現變化，風向與風速也可能突然改變。",
+ cause:"當地面受熱使暖濕空氣快速上升，空氣在高空冷卻後形成大量雲滴與冰晶，積雲便可能持續向上發展成積雨雲。雲內強烈的上升及下降氣流，使冰晶、冰雹及水滴碰撞，產生電荷分離，進而形成閃電。",
+ steps:["地面受熱，暖濕空氣開始上升。","空氣持續冷卻，積雲逐漸向上發展。","雲體發展成高聳的積雨雲，內部出現強烈對流。","雲內電荷分離，可能出現閃電、雷聲及強降雨。"],
+ clouds:"雷雨最具代表性的雲種是積雨雲。它的雲體非常高大，底部通常較暗，頂部可能向外擴展成鐵砧狀。積雨雲通常代表大氣中存在較強的垂直對流。",
+ notes:"聽到雷聲時，應儘快進入室內或有遮蔽的安全場所。避免停留在空曠地、樹下或水域附近。雷雨期間也要注意瞬間強陣風及短延時強降雨。"
+},
+{
+ name:"颱風", icon:"🌀", desc:"認識熱帶氣旋的形成與發展",
+ intro:"颱風是發源於熱帶或副熱帶海洋的強烈低氣壓系統，具有明顯的旋轉環流。台灣位於西北太平洋颱風活動頻繁的區域，夏季至秋季較容易受到颱風影響。",
+ signs:"颱風接近時，可能出現風速逐漸增強、雲量增加、氣壓下降及濕度提高等變化。海面上的長浪也可能在颱風中心尚未接近前就抵達沿岸。實際變化會依颱風路徑、大小及距離而不同。",
+ cause:"熱帶海洋提供充足水氣與熱能，暖濕空氣上升後形成低氣壓。水氣凝結釋放的潛熱能幫助系統持續發展。在適合的環境下，低氣壓逐漸組織成旋轉環流，並可能增強為颱風。",
+ steps:["熱帶海面溫暖，提供充足水氣與能量。","暖濕空氣持續上升，形成熱帶低氣壓。","對流雲系逐漸組織化，旋轉環流增強。","系統持續發展，可能增強為颱風並移動。"],
+ clouds:"颱風周圍常有大量深厚對流雲系，從衛星影像可看到螺旋狀雲帶。颱風中心附近可能出現颱風眼，周圍則有強烈對流的眼牆。外圍環流也可能帶來大量雲雨。",
+ notes:"颱風可能帶來強風、豪雨、海浪及淹水等災害。颱風影響不只發生在中心通過的地區，外圍環流及地形也會影響各地的風雨。應以中央氣象署及政府發布的警報為準。"
+},
+{
+ name:"濃霧", icon:"🌫️", desc:"認識近地面水氣凝結與能見度下降",
+ intro:"霧是懸浮在近地面空氣中的微小水滴或冰晶，當霧使能見度明顯降低時，便可能被稱為濃霧。台灣在冬季、清晨及山區較容易出現霧。",
+ signs:"霧形成前，近地面濕度通常較高，氣溫可能逐漸接近露點。風速較弱時，近地面水氣不容易快速散開。夜間地面散熱也可能使近地面空氣降溫，增加水氣凝結的機會。",
+ cause:"當近地面空氣冷卻至露點，或水氣含量增加至飽和狀態時，水氣會凝結成懸浮在空氣中的微小水滴。大量水滴散射光線，使遠方景物變得模糊，能見度降低。",
+ steps:["近地面空氣濕度逐漸提高。","夜間輻射冷卻或其他因素使空氣降溫。","氣溫接近露點，水氣開始凝結。","大量微小水滴懸浮在空氣中，形成霧。"],
+ clouds:"霧與雲的本質相近，都是由空氣中的微小水滴或冰晶構成。主要差別在於形成位置：雲通常形成在地面以上，霧則貼近地面。層雲若接觸地面，也可能形成霧。",
+ notes:"濃霧會使道路、機場及港口能見度下降。開車時應降低速度、保持安全距離並開啟適當燈光。山區及河谷在清晨尤其需要留意局部霧氣。"
+},
+{
+ name:"強風", icon:"💨", desc:"認識風速增強與氣壓差異",
+ intro:"強風是指風速明顯增強的現象，可能由東北季風、颱風、鋒面或局部地形效應造成。不同成因的強風，其持續時間及影響範圍也有所不同。",
+ signs:"強風發生前，可能觀察到氣壓梯度增大，也就是不同地區之間的氣壓差異變得明顯。天氣系統接近時，風向可能逐漸改變，風速也可能持續增加。部分地區會因地形而出現局部增強的風。",
+ cause:"空氣會受到氣壓梯度力作用，由較高氣壓區域朝較低氣壓區域移動。氣壓差異在一定距離內越明顯，通常越有利於形成較強的風。地球自轉及地表摩擦也會影響實際風向與風速。",
+ steps:["天氣系統移動，使不同地區的氣壓差異增加。","氣壓梯度力增強，推動空氣移動。","風速逐漸增加，局部地區可能受到地形加強。","形成持續或陣發性的強風。"],
+ clouds:"強風本身不一定對應特定雲種。若強風與鋒面或颱風有關，天空可能出現層狀雲、積雨雲或大片螺旋狀雲系。觀察雲層時應同時考慮天氣系統的背景。",
+ notes:"強風可能吹落招牌、樹枝或其他物品。戶外活動應留意高處墜物，並避免靠近施工圍籬、老舊建築及大型樹木。沿海與空曠地區也可能受到較強風力影響。"
+},
+{
+ name:"寒流", icon:"🥶", desc:"認識冷空氣南下與氣溫驟降",
+ intro:"寒流是冬季影響台灣的重要天氣現象，通常與強烈大陸冷氣團或更強的冷空氣南下有關。當冷空氣持續移入，台灣各地氣溫可能明顯下降，北部及東北部通常較容易受到影響。",
+ signs:"寒流到來前，可能先觀察到鋒面接近、風向轉為偏北或東北風，以及氣溫逐漸下降。氣壓可能因大陸高壓南下而上升。濕度及降雨情況則會依冷空氣路徑與水氣條件而有所不同。",
+ cause:"冬季大陸地區受到強烈冷卻，形成冷高壓。當冷空氣向南移動並影響台灣時，冷空氣便會逐漸取代原本較暖的空氣，使氣溫下降。若冷空氣同時帶有充足水氣，迎風面也可能出現降雨。",
+ steps:["大陸冷高壓逐漸增強，冷空氣開始向南移動。","鋒面或冷空氣前緣接近台灣。","偏北或東北風增強，冷空氣持續移入。","氣溫明顯下降，進入寒冷天氣。"],
+ clouds:"寒流本身並沒有專屬雲種。若伴隨鋒面，可能出現層狀雲及降雨雲系；若東北季風帶來水氣，北部及東北部可能出現低層雲、層雲及地形雲。",
+ notes:"寒流期間應注意保暖，尤其是長者、幼童及心血管疾病患者。使用瓦斯熱水器或燃氣設備時，也要留意室內通風，避免一氧化碳中毒。"
+}
+];
+
+const chapters = [
+"天氣介紹",
+"發生前的氣象徵兆",
+"天氣形成原因",
+"天氣變化流程",
+"雲種介紹",
+"相關知識與注意事項"
+];
+
+const clouds = [
+["卷雲","☁️","高空中常見的絲狀或羽毛狀雲，主要由冰晶組成。通常呈現白色、纖細的外觀。"],
+["卷層雲","🌤️","薄而透明的雲層，常覆蓋大片天空，有時會使太陽或月亮周圍出現光環。"],
+["卷積雲","☁️","由細小白色雲塊組成，排列整齊時常被稱為魚鱗狀雲。"],
+["高層雲","🌥️","呈灰白色或藍灰色的大片雲層，太陽可能透過雲層呈現模糊輪廓。"],
+["高積雲","☁️","由一群中層雲塊組成，外觀像一片片排列的棉絮。"],
+["層雲","🌫️","低而均勻的灰色雲層，外觀類似抬升到空中的霧，有時會帶來毛毛雨。"],
+["層積雲","☁️","低空中大片排列的雲塊，常呈灰白色，雲塊之間可能留有空隙。"],
+["雨層雲","🌧️","厚而廣泛的灰暗雲層，常帶來範圍較廣且持續時間較長的降雨。"],
+["積雲","⛅","底部較平坦、頂部向上隆起，常見於晴朗天氣，也可能持續發展。"],
+["積雨雲","⛈️","高聳且發展旺盛的雲體，頂部可能呈鐵砧狀，常伴隨雷雨及強降雨。"]
+];
+
+// ===============================
+// 畫面切換
+// ===============================
+
+const app = document.getElementById("app");
+let currentWeather = 0;
+let currentChapter = 0;
+
+function showHome(scrollToWeather = false) {
+  app.innerHTML = `
+    <section class="hero">
+      <div class="hero-content">
+        <small>WEATHER ENCYCLOPEDIA</small>
+        <h1>探索天空的變化<br>認識每一種天氣</h1>
+        <p>從雲朵、氣壓到溫度與濕度，了解不同天氣的形成原因，以及發生前可能出現的氣象徵兆。</p>
+        <button class="primary-btn" onclick="document.getElementById('weather-section').scrollIntoView({behavior:'smooth'})">開始探索 →</button>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="section-title">
+        <h2>認識天氣百科</h2>
+        <p>透過簡單的科普介紹，了解大氣環境如何影響我們的生活。</p>
+      </div>
+      <div class="info-panel">
+        <h3>天氣是如何形成的？</h3>
+        天氣是大氣在特定時間與地點呈現的狀態，受到溫度、濕度、氣壓、風及水氣等因素影響。
+        不同的大氣條件相互作用，便會形成晴天、降雨、雷雨等各種天氣現象。
+        本網站將帶你從天氣發生前的徵兆開始，逐步了解各種天氣的形成過程。
+      </div>
+    </section>
+
+    <section class="container" id="weather-section">
+      <div class="section-title">
+        <h2>天氣分類</h2>
+        <p>選擇想了解的天氣，開始閱讀六個章節。</p>
+      </div>
+      <div class="weather-grid">
+        ${weatherData.map((w,i)=>`
+          <div class="weather-card" onclick="openWeather(${i})">
+            <div class="card-art">${w.icon}</div>
+            <div class="card-info">
+              <h3>${w.name}</h3>
+              <p>${w.desc}</p>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="section-title">
+        <h2>天氣小知識</h2>
+        <p>幾個值得認識的氣象觀念。</p>
+      </div>
+      <div class="fact-grid">
+        <div class="fact"><strong>☁️ 雲是什麼？</strong>雲主要由懸浮在空氣中的微小水滴或冰晶組成。</div>
+        <div class="fact"><strong>🌡️ 什麼是露點？</strong>當空氣冷卻至露點，水氣便可能開始凝結。</div>
+        <div class="fact"><strong>🌬️ 風從哪裡來？</strong>氣壓差異會推動空氣移動，形成風。</div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="info-panel">
+        <h3>☁️ 雲種圖鑑</h3>
+        <p>天空中的雲有不同的外觀與高度，部分雲種也能反映大氣的發展情況。</p>
+        <button class="primary-btn" style="background:var(--navy);color:white" onclick="showClouds()">探索雲種圖鑑 →</button>
+      </div>
+    </section>
+  `;
+
+  if (scrollToWeather) {
+    setTimeout(()=>document.getElementById("weather-section").scrollIntoView(),50);
+  }
+}
+
+// ===============================
+// 天氣介紹閱讀器
+// ===============================
+
+function openWeather(index) {
+  currentWeather = index;
+  currentChapter = 0;
+  renderReader();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function chapterContent(w, chapter) {
+  switch(chapter) {
+    case 0:
+      return `<p>${w.intro}</p>
+        <div class="weather-note">🌤️ <strong>閱讀重點：</strong>先認識這種天氣的外觀與常見特徵，再了解背後的大氣變化。</div>`;
+
+    case 1:
+      return `<p>${w.signs}</p>
+        <div class="weather-note">📌 注意：上述現象是可能出現的氣象徵兆，並不是每次天氣變化都會依照相同順序發生。</div>`;
+
+    case 2:
+      return `<p>${w.cause}</p>
+        <div class="weather-note">🌡️ 氣象原理：氣壓、溫度、濕度及空氣運動會相互影響，需要搭配整體環境判斷。</div>`;
+
+    case 3:
+      return `<p>以下是此類天氣可能的發展過程：</p>
+        <div class="timeline">
+          ${w.steps.map((s,i)=>`
+            <div class="timeline-item">
+              <strong>階段 ${i+1}</strong>
+              <div>${s}</div>
+            </div>
+          `).join("")}
+        </div>
+        <div class="weather-note">流程為概念性示意，不代表所有地區或每次天氣事件都會完全相同。</div>`;
+
+    case 4:
+      return `<p>${w.clouds}</p>
+        <p>雲的種類可依高度及外觀分類，並非所有雲都會帶來降雨。可以前往雲種圖鑑認識更多種類。</p>
+        <button class="primary-btn" style="background:var(--navy);color:white" onclick="showClouds()">前往雲種圖鑑 →</button>`;
+
+    case 5:
+      return `<p>${w.notes}</p>
+        <div class="weather-note">⚠️ 氣象資訊僅供科普學習。遇到實際天氣警報或災害風險時，請以中央氣象署及政府機關發布的資訊為準。</div>`;
+  }
+}
+
+function renderReader() {
+  const w = weatherData[currentWeather];
+
+  app.innerHTML = `
+    <section class="reader">
+      <button class="back-btn" onclick="showHome(true)">← 返回天氣分類</button>
+
+      <div class="reader-header">
+        <div>
+          <h1>${w.icon} ${w.name}</h1>
+          <p>${w.desc}</p>
+        </div>
+        <div style="color:var(--muted)">Weather Encyclopedia</div>
+      </div>
+
+      <div class="chapter-menu">
+        ${chapters.map((c,i)=>`
+          <button class="${i===currentChapter?'active':''}"
+            onclick="goChapter(${i})">
+            ${i+1}. ${c}
+          </button>
+        `).join("")}
+      </div>
+
+      <div class="book-page" id="book-page">
+        <div class="page-banner">
+          <small>CHAPTER ${currentChapter+1} / 6</small>
+          <h2>${chapters[currentChapter]}</h2>
+          <div style="color:var(--muted)">認識${w.name}的氣象知識與變化</div>
+        </div>
+        <div class="page-content">
+          ${chapterContent(w,currentChapter)}
+        </div>
+      </div>
+
+      <div class="reader-controls">
+        <button onclick="changeChapter(-1)" ${currentChapter===0?'disabled':''}>← 上一頁</button>
+        <span class="page-count">${currentChapter+1} / 6</span>
+        <button onclick="changeChapter(1)" ${currentChapter===5?'disabled':''}>下一頁 →</button>
+      </div>
+
+      ${currentChapter===5?`
+        <div class="info-panel" style="text-align:center">
+          <h3>已完成 ${w.name} 的閱讀！</h3>
+          <p>可以返回分類，繼續認識其他天氣。</p>
+          <button class="primary-btn" style="background:var(--navy);color:white" onclick="showHome(true)">返回天氣分類</button>
+        </div>
+      `:""}
+    </section>
+  `;
+}
+
+function goChapter(index) {
+  if(index<0 || index>5) return;
+  currentChapter = index;
+  renderReader();
+}
+
+function changeChapter(direction) {
+  goChapter(currentChapter+direction);
+}
+
+// 支援觸控左右滑動
+let touchStartX = 0;
+
+app.addEventListener("touchstart",e=>{
+  touchStartX=e.changedTouches[0].screenX;
+},{passive:true});
+
+app.addEventListener("touchend",e=>{
+  if(!app.querySelector(".book-page")) return;
+  const diff=e.changedTouches[0].screenX-touchStartX;
+  if(Math.abs(diff)>80) {
+    if(diff<0) changeChapter(1);
+    else changeChapter(-1);
+  }
+},{passive:true});
+
+// ===============================
+// 雲種圖鑑
+// ===============================
+
+function showClouds() {
+  app.innerHTML = `
+    <section class="container">
+      <button class="back-btn" onclick="showHome()">← 返回首頁</button>
+      <div class="section-title">
+        <h2>☁️ 雲種圖鑑</h2>
+        <p>認識天空中不同形狀與高度的雲。</p>
+      </div>
+
+      <div class="info-panel" style="margin-bottom:25px">
+        <h3>雲是如何形成的？</h3>
+        當空氣中的水氣凝結成微小水滴，或水氣直接凝華形成冰晶時，便可能形成雲。
+        不同高度、溫度及大氣環境，會使雲呈現不同的外觀。
+      </div>
+
+      <div class="cloud-grid">
+        ${clouds.map(c=>`
+          <div class="cloud-card">
+            <div class="cloud-icon">${c[1]}</div>
+            <h3>${c[0]}</h3>
+            <p>${c[2]}</p>
+          </div>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
+// 首頁初始化
+showHome();
+
+</script>
+</body>
+</html>
